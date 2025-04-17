@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Bodas - SantaGLAM</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fff0f5;
+            margin: 0;
+            padding: 2rem;
+        }
+        h1, h2 {
+            color: #d63384;
+        }
+        .form-section, .services-section {
+            margin-bottom: 2rem;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #d63384;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+        .checkbox {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        button {
+            background-color: #d63384;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .total {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cotizaciones de Bodas</h1>
+    <button onclick="iniciarCotizacion()">Crear Nueva Cotización</button>
+
+    <div id="formulario" style="display:none;">
+        <div class="form-section">
+            <h2>Información General</h2>
+            <label>Nombre de la Novia *</label>
+            <input type="text" id="novia" required>
+
+            <label>Nombre del Novio</label>
+            <input type="text" id="novio">
+
+            <label>Aproximación de Invitados</label>
+            <select id="invitados">
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="150">150</option>
+            </select>
+            <input type="number" id="invitadosPersonalizado" placeholder="Otro número">
+
+            <label>Colores a Resaltar</label>
+            <input type="text" id="coloresResaltar">
+
+            <label>Colores a Prohibir</label>
+            <input type="text" id="coloresProhibir">
+
+            <label>Número de Damas</label>
+            <select id="damas">
+                <option value="">/Sin número definido/</option>
+            </select>
+            <input type="number" id="damasPersonalizado" placeholder="Otro número">
+
+            <button onclick="guardarInfoBasica()">Guardar Información</button>
+        </div>
+
+        <div class="services-section" id="servicios" style="display:none;">
+            <h2>Servicios</h2>
+            <div id="listaServicios"></div>
+            <div class="total">Total: ₡<span id="totalFinal">0</span></div>
+            <button onclick="guardarCotizacion()">Guardar Cotización</button>
+        </div>
+    </div>
+
+    <script>
+        const serviciosDisponibles = [
+            { nombre: 'Reservación', precio: 50000000 },
+            { nombre: 'Helicóptero y Carro', precio: 50000000 },
+            { nombre: 'Comidas y Bebidas', precio: 20000000 },
+            { nombre: 'Sesión fotográfica', precio: 20000000 },
+            { nombre: 'El Cantante', precio: 20000000 },
+            { nombre: 'Accesorios', precio: 50000000 },
+            { nombre: 'DJ o Mariachis', precio: 20000000 },
+            { nombre: 'Meseros', precio: 20000000 },
+            { nombre: 'Impuestos', precio: 10000000 },
+            { nombre: 'LS Corp', precio: 50000000 },
+            { nombre: 'Abogado o Cura', precio: 50000000 },
+            { nombre: 'Servicio Floral', precio: 50000000 },
+            { nombre: 'Recuerdos de novios', precio: 20000000 },
+            { nombre: 'Mapeo Grande / Sin fotos', precio: 80000000 },
+            { nombre: 'Mapeo Mediano / Con fotos', precio: 60000000 },
+            { nombre: 'Flyer de Invitación', precio: 5000000 },
+            { nombre: 'Vídeo Conmemorativo', precio: 30000000 },
+        ];
+
+        let cotizacionActual = {};
+        let total = 0;
+
+        function iniciarCotizacion() {
+            document.getElementById('formulario').style.display = 'block';
+        }
+
+        function guardarInfoBasica() {
+            cotizacionActual = {
+                usuario: localStorage.getItem('usuarioActivo') || 'desconocido',
+                novia: document.getElementById('novia').value,
+                novio: document.getElementById('novio').value,
+                invitados: document.getElementById('invitadosPersonalizado').value || document.getElementById('invitados').value,
+                coloresResaltar: document.getElementById('coloresResaltar').value,
+                coloresProhibir: document.getElementById('coloresProhibir').value,
+                damas: document.getElementById('damasPersonalizado').value || '/Sin número definido/',
+                servicios: []
+            };
+
+            if (!cotizacionActual.novia) {
+                alert("Debe ingresar el nombre de la novia");
+                return;
+            }
+
+            mostrarServicios();
+        }
+
+        function mostrarServicios() {
+            document.getElementById('servicios').style.display = 'block';
+            const contenedor = document.getElementById('listaServicios');
+            contenedor.innerHTML = '';
+            total = 0;
+
+            serviciosDisponibles.forEach((serv, i) => {
+                const div = document.createElement('div');
+                div.className = 'checkbox';
+                div.innerHTML = `
+                    <label><input type="checkbox" onchange="calcularTotal(${serv.precio}, this, ${i})"> ${serv.nombre}</label>
+                    <span>₡${serv.precio.toLocaleString()}</span>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function calcularTotal(precio, checkbox, index) {
+            if (checkbox.checked) {
+                total += precio;
+                cotizacionActual.servicios.push(serviciosDisponibles[index]);
+            } else {
+                total -= precio;
+                cotizacionActual.servicios = cotizacionActual.servicios.filter(s => s.nombre !== serviciosDisponibles[index].nombre);
+            }
+            document.getElementById('totalFinal').textContent = total.toLocaleString();
+        }
+
+        function guardarCotizacion() {
+            let cotizaciones = JSON.parse(localStorage.getItem('cotizacionesBodas')) || [];
+            cotizacionActual.total = total;
+            cotizaciones.push(cotizacionActual);
+            localStorage.setItem('cotizacionesBodas', JSON.stringify(cotizaciones));
+            alert("Cotización guardada exitosamente");
+            location.reload();
+        }
+    </script>
+</body>
+</html>

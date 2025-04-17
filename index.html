@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SantaGLAM - Panel de Empleadas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff0f5;
+        }
+
+        header {
+            background-image: url('banner.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 1rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-content {
+            background-color: rgba(255, 255, 255, 0.85);
+            display: inline-block;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 15px #d63384;
+            margin-bottom: 1rem;
+        }
+
+        .header-content h1,
+        .header-content p {
+            color: #d63384;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #f8d7da;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #d63384;
+            padding: 1rem;
+            display: block;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            background-color: #ffc8dd;
+        }
+
+        main {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #f8d7da;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .form-container input,
+        .form-container button,
+        .form-container select {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #d63384;
+        }
+
+        .form-container button {
+            background-color: #d63384;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background-color: #b11f6c;
+        }
+
+        .toggle-link {
+            color: #d63384;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <img src="logo.png" alt="Logo de SantaGLAM" class="logo">
+            <h1>𝒮𝒶𝓃𝓉𝒶𝐺𝐿𝐴𝐌</h1>
+            <p>Nube de Empleadas</p>
+        </div>
+    </header>
+
+    <nav>
+        <a href="index.html">Inicio</a>
+        <a href="bodas.html">Bodas</a>
+        <a href="#">Baby Showers</a>
+        <a href="bitacora.html">Bitácoras</a>
+        <a href="#">Agenda</a>
+<button id="logoutBtn" style="margin-left:auto; margin-right:1rem; background:#d63384; color:white; border:none; padding:0.5rem 1rem; border-radius:5px; cursor:pointer;">
+    Cerrar Sesión
+</button>
+    </nav>
+
+    <main>
+        <h2>፟ፃ</h2>
+        <p>Seleccioná una opción del menú para empezar a trabajar ✨</p>
+
+        <div class="form-container">
+            <button id="toggleFormBtn">Iniciar Sesión o Registrarse</button>
+
+            <div id="formWrapper" style="display:none;">
+                <h3 id="formTitle">Iniciar Sesión</h3>
+                <form id="userForm">
+                    <div id="loginForm">
+                        <label for="loginUser">Usuario:</label>
+                        <input type="text" id="loginUser" required>
+                        <label for="loginPassword">Contraseña:</label>
+                        <input type="password" id="loginPassword" required>
+                        <button type="button" id="loginBtn">Iniciar Sesión</button>
+                        <p id="registerLink" class="toggle-link">¿No tienes cuenta? Regístrate aquí</p>
+                    </div>
+
+                    <div id="registerForm" style="display:none;">
+                        <label for="user">Usuario:</label>
+                        <input type="text" id="user" required>
+                        <label for="name">Nombre IC:</label>
+                        <input type="text" id="name" required>
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" required>
+                        <label for="role">Rol de trabajo:</label>
+                        <select id="role" required>
+                            <option value="Administrativa">Administrativa</option>
+                            <option value="Organizadora de Bodas">Organizadora de Bodas</option>
+                            <option value="Modelo">Modelo</option>
+                            <option value="Mesera">Mesera</option>
+                            <option value="Guardia de Seguridad">Guardia de Seguridad</option>
+                        </select>
+                        <button type="button" id="registerBtn">Registrarse</button>
+                        <p id="loginLink" class="toggle-link">¿Ya tienes cuenta? Inicia sesión aquí</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="welcomeMessage" style="display:none;"></div>
+
+    </main>
+
+    <footer>
+        SantaGLAM © 2025 | Solo para uso interno
+    </footer>
+
+    <script>
+        const toggleFormBtn = document.getElementById('toggleFormBtn');
+        const formWrapper = document.getElementById('formWrapper');
+        const formTitle = document.getElementById('formTitle');
+        const registerForm = document.getElementById('registerForm');
+        const loginForm = document.getElementById('loginForm');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        toggleFormBtn.addEventListener('click', () => {
+            formWrapper.style.display = formWrapper.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('loginLink').addEventListener('click', () => {
+            formTitle.textContent = 'Iniciar Sesión';
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+
+        document.getElementById('registerLink').addEventListener('click', () => {
+            formTitle.textContent = 'Registrarse';
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        // Registro
+        document.getElementById('registerBtn').addEventListener('click', () => {
+            const user = document.getElementById('user').value;
+            const name = document.getElementById('name').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            if (users.some(u => u.user === user)) {
+                alert("Este usuario ya está registrado.");
+                return;
+            }
+
+            const newUser = { user, name, password, role, approved: false };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            welcomeMessage.style.display = 'block';
+            welcomeMessage.innerHTML = `¡Gracias por registrarte, ${name}!`;
+
+            setTimeout(() => {
+                formWrapper.style.display = 'none';
+                welcomeMessage.style.display = 'none';
+            }, 3000);
+        });
+
+       function guardarSesion(user) {
+    localStorage.setItem('sesionActiva', JSON.stringify(user));
+}
+
+// Mostrar perfil en el header
+function mostrarPerfil(user) {
+    toggleFormBtn.style.display = 'none';
+    welcomeMessage.style.display = 'block';
+    welcomeMessage.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <p>¡Bienvenida, ${user.name}!</p>
+            <img id="profilePic" src="${user.foto || 'default.jpg'}" alt="Foto de perfil" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid #d63384;">
+        </div>
+    `;
+
+    // Permitir cambiar foto
+    const profileImg = document.getElementById('profilePic');
+    profileImg.addEventListener('click', () => {
+        const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
+        if (nuevaFoto) {
+            user.foto = nuevaFoto;
+            localStorage.setItem('users', JSON.stringify(users));
+            guardarSesion(user);
+            mostrarPerfil(user); // Recargar foto
+        }
+    });
+}
+
+// Si ya hay una sesión activa, mostrar perfil
+const sesionGuardada = JSON.parse(localStorage.getItem('sesionActiva'));
+if (sesionGuardada) {
+    mostrarPerfil(sesionGuardada);
+}
+
+// Registro con foto por defecto
+document.getElementById('registerBtn').addEventListener('click', () => {
+    const user = document.getElementById('user').value;
+    const name = document.getElementById('name').value;
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
+
+    if (users.some(u => u.user === user)) {
+        alert("Este usuario ya está registrado.");
+        return;
+    }
+
+    const newUser = { user, name, password, role, foto: 'default.jpg', approved: false };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    guardarSesion(newUser);
+    mostrarPerfil(newUser);
+});
+
+// Inicio de sesión
+document.getElementById('loginBtn').addEventListener('click', () => {
+    const loginUser = document.getElementById('loginUser').value;
+    const loginPassword = document.getElementById('loginPassword').value;
+
+    const user = users.find(user => user.user === loginUser && user.password === loginPassword);
+
+    if (user) {
+        guardarSesion(user);
+        mostrarPerfil(user);
+
+        setTimeout(() => {
+            if (user.role === 'Administrativa') {
+                window.location.href = 'bitacora.html';
+            } else if (user.role === 'Organizadora de Bodas') {
+                window.location.href = 'bodas.html';
+            } else if (user.role === 'Mesera') {
+                window.location.href = 'menu.html';
+            }
+        }, 1000);
+    } else {
+        alert('Usuario o contraseña incorrectos.');
+    }
+});
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem('sesionActiva');
+    location.reload();
+});
+
+    </script>
+
+</body>
+</html>

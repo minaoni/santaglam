@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitácora - SantaGLAM</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff0f5;
+        }
+        header {
+            background-color: #d63384;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+        }
+        button {
+            background-color: #d63384;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #b11f6c;
+        }
+        #adminHistory {
+            margin-top: 2rem;
+            background-color: #ffe6f0;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        select {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #d63384;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .bitacora-entry {
+            background-color: white;
+            border: 1px solid #f5a2c1;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bitácora de Empleadas</h1>
+    </header>
+
+    <main>
+        <div class="section">
+            <button onclick="marcarEntrada()">Marcar Hora de Entrada</button>
+            <button onclick="marcarSalida()">Marcar Hora de Salida</button>
+            <br><br>
+            <label for="monto">Monto Vendido:</label>
+            <input type="number" id="monto" placeholder="₡0">
+            <label for="clientes">Clientes Atendidos (opcional):</label>
+            <input type="number" id="clientes" placeholder="0">
+            <button onclick="guardarBitacora()">Guardar Bitácora</button>
+        </div>
+
+        <div class="section">
+            <button onclick="window.location.href='index.html'">← Regresar al Inicio</button>
+        </div>
+
+        <div class="section">
+            <button onclick="mostrarHistorialAdmin()">Historial para Administradoras</button>
+            <div id="adminHistory" style="display:none;">
+                <h3>Seleccioná una empleada:</h3>
+                <select id="usuarioSelect" onchange="mostrarBitacoraUsuario()"></select>
+                <div id="bitacoraDetalle"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let bitacoras = JSON.parse(localStorage.getItem('bitacoras')) || [];
+
+    // Cargar sesión activa (nombre IC del usuario)
+    const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
+    if (sesion) {
+        localStorage.setItem('usuarioActivo', sesion.name);
+    }
+
+    function getHoraActual() {
+        return new Date().toLocaleString();
+    }
+
+    function marcarEntrada() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const entrada = { usuario, entrada: getHoraActual(), salida: null, monto: null, clientes: null };
+        bitacoras.push(entrada);
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Entrada marcada correctamente");
+    }
+
+    function marcarSalida() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.salida === null);
+        if (!entrada) return alert("No se encontró una entrada activa");
+        entrada.salida = getHoraActual();
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Salida marcada correctamente");
+    }
+
+    function guardarBitacora() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const monto = document.getElementById('monto').value;
+        const clientes = document.getElementById('clientes').value;
+
+        const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.monto === null);
+        if (!entrada) return alert("No se encontró entrada válida para actualizar");
+        entrada.monto = monto;
+        entrada.clientes = clientes;
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Bitácora guardada correctamente");
+    }
+
+    function mostrarHistorialAdmin() {
+        const adminDiv = document.getElementById('adminHistory');
+        const select = document.getElementById('usuarioSelect');
+
+        const usuariosRegistrados = JSON.parse(localStorage.getItem('users')) || [];
+
+        select.innerHTML = '<option value="">-- Seleccione --</option>';
+        usuariosRegistrados.forEach(usuario => {
+            const option = document.createElement('option');
+            option.value = usuario.name;
+            option.textContent = usuario.name;
+            select.appendChild(option);
+        });
+
+        adminDiv.style.display = 'block';
+    }
+
+    function mostrarBitacoraUsuario() {
+        const usuario = document.getElementById('usuarioSelect').value;
+        const detalleDiv = document.getElementById('bitacoraDetalle');
+        detalleDiv.innerHTML = '';
+
+        if (!usuario) return;
+
+        const registros = bitacoras.filter(b => b.usuario === usuario);
+        if (registros.length === 0) {
+            detalleDiv.innerHTML = `<p>No hay registros aún para ${usuario}.</p>`;
+            return;
+        }
+
+        registros.forEach(b => {
+            const div = document.createElement('div');
+            div.classList.add('bitacora-entry');
+            div.innerHTML = `
+                <strong>Entrada:</strong> ${b.entrada || '---'}<br>
+                <strong>Salida:</strong> ${b.salida || '---'}<br>
+                <strong>Monto Vendido:</strong> ₡${b.monto || '0'}<br>
+                <strong>Clientes:</strong> ${b.clientes || '0'}
+            `;
+            detalleDiv.appendChild(div);
+        });
+    }
+
+
+    </script>
+</body>
+</html>
+
+<footer>
+    <button onclick="window.location.href='index.html'" style="
+        background-color: #d63384;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    ">
+        ← Regresar al Inicio
+    </button>
+    <p style="margin-top: 10px;">SantaGLAM © 2025 | Solo para uso interno</p>
+</footer>
