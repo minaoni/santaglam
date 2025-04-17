@@ -117,118 +117,113 @@
         </div>
     </main>
 
-    <script>
-        let bitacoras = JSON.parse(localStorage.getItem('bitacoras')) || [];
+ <script>
+    let bitacoras = JSON.parse(localStorage.getItem('bitacoras')) || [];
 
-        // Cargar sesión activa (nombre IC del usuario)
-        const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
-        if (sesion) {
-            localStorage.setItem('usuarioActivo', sesion.name);
-        }
+    // Cargar sesión activa (nombre IC del usuario)
+    const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
+    if (sesion) {
+        localStorage.setItem('usuarioActivo', sesion.name);
+        mostrarPerfil(sesion); // 👈 Se muestra el perfil aquí
+    }
 
-        function getHoraActual() {
-            return new Date().toLocaleString();
-        }
+    function getHoraActual() {
+        return new Date().toLocaleString();
+    }
 
-        function marcarEntrada() {
-            const usuario = localStorage.getItem('usuarioActivo');
-            if (!usuario) return alert("Debe iniciar sesión primero");
-            const entrada = { usuario, entrada: getHoraActual(), salida: null, monto: null, clientes: null };
-            bitacoras.push(entrada);
-            localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
-            alert("Entrada marcada correctamente");
-        }
+    function marcarEntrada() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const entrada = { usuario, entrada: getHoraActual(), salida: null, monto: null, clientes: null };
+        bitacoras.push(entrada);
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Entrada marcada correctamente");
+    }
 
-        function marcarSalida() {
-            const usuario = localStorage.getItem('usuarioActivo');
-            if (!usuario) return alert("Debe iniciar sesión primero");
-            const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.salida === null);
-            if (!entrada) return alert("No se encontró una entrada activa");
-            entrada.salida = getHoraActual();
-            localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
-            alert("Salida marcada correctamente");
-        }
+    function marcarSalida() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.salida === null);
+        if (!entrada) return alert("No se encontró una entrada activa");
+        entrada.salida = getHoraActual();
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Salida marcada correctamente");
+    }
 
-        function guardarBitacora() {
-            const usuario = localStorage.getItem('usuarioActivo');
-            if (!usuario) return alert("Debe iniciar sesión primero");
-            const monto = document.getElementById('monto').value;
-            const clientes = document.getElementById('clientes').value;
+    function guardarBitacora() {
+        const usuario = localStorage.getItem('usuarioActivo');
+        if (!usuario) return alert("Debe iniciar sesión primero");
+        const monto = document.getElementById('monto').value;
+        const clientes = document.getElementById('clientes').value;
 
-            const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.monto === null);
-            if (!entrada) return alert("No se encontró entrada válida para actualizar");
-            entrada.monto = monto;
-            entrada.clientes = clientes;
-            localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
-            alert("Bitácora guardada correctamente");
-        }
+        const entrada = [...bitacoras].reverse().find(b => b.usuario === usuario && b.monto === null);
+        if (!entrada) return alert("No se encontró entrada válida para actualizar");
+        entrada.monto = monto;
+        entrada.clientes = clientes;
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
+        alert("Bitácora guardada correctamente");
+    }
 
-        function mostrarHistorialAdmin() {
-            const adminDiv = document.getElementById('adminHistory');
-            const select = document.getElementById('usuarioSelect');
+    function mostrarHistorialAdmin() {
+        const adminDiv = document.getElementById('adminHistory');
+        const select = document.getElementById('usuarioSelect');
 
-            const usuariosRegistrados = JSON.parse(localStorage.getItem('users')) || [];
+        const usuariosRegistrados = JSON.parse(localStorage.getItem('users')) || [];
 
-            select.innerHTML = '<option value="">-- Seleccione --</option>';
-            usuariosRegistrados.forEach(usuario => {
-                const option = document.createElement('option');
-                option.value = usuario.name;
-                option.textContent = usuario.name;
-                select.appendChild(option);
-            });
-
-            adminDiv.style.display = 'block';
-        }
-
-        function mostrarBitacoraUsuario() {
-            const usuario = document.getElementById('usuarioSelect').value;
-            const detalleDiv = document.getElementById('bitacoraDetalle');
-            detalleDiv.innerHTML = '';
-
-            if (!usuario) return;
-
-            const registros = bitacoras.filter(b => b.usuario === usuario);
-            if (registros.length === 0) {
-                detalleDiv.innerHTML = `<p>No hay registros aún para ${usuario}.</p>`;
-                return;
-            }
-
-            registros.forEach(b => {
-                const div = document.createElement('div');
-                div.classList.add('bitacora-entry');
-                div.innerHTML = `
-                    <strong>Entrada:</strong> ${b.entrada || '---'}<br>
-                    <strong>Salida:</strong> ${b.salida || '---'}<br>
-                    <strong>Monto Vendido:</strong> ₡${b.monto || '0'}<br>
-                    <strong>Clientes:</strong> ${b.clientes || '0'}
-                `;
-                detalleDiv.appendChild(div);
-            });
-        }
-
-        function mostrarPerfil(user) {
-            const container = document.getElementById('perfilUsuario');
-            if (!container) return;
-
-            container.innerHTML = `                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="${user.foto || 'default.jpg'}" alt="Foto de perfil" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #d63384;">
-                    <strong>${user.name}</strong>
-                </div>
-            `;
-        }
-
-        const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
-        if (sesion) {
-            mostrarPerfil(sesion);
-        }
-
-        document.getElementById('logoutBtn')?.addEventListener('click', () => {
-            localStorage.removeItem('sesionActiva');
-            location.href = 'index.html';
+        select.innerHTML = '<option value="">-- Seleccione --</option>';
+        usuariosRegistrados.forEach(usuario => {
+            const option = document.createElement('option');
+            option.value = usuario.name;
+            option.textContent = usuario.name;
+            select.appendChild(option);
         });
 
-    </script>
+        adminDiv.style.display = 'block';
+    }
+
+    function mostrarBitacoraUsuario() {
+        const usuario = document.getElementById('usuarioSelect').value;
+        const detalleDiv = document.getElementById('bitacoraDetalle');
+        detalleDiv.innerHTML = '';
+
+        if (!usuario) return;
+
+        const registros = bitacoras.filter(b => b.usuario === usuario);
+        if (registros.length === 0) {
+            detalleDiv.innerHTML = `<p>No hay registros aún para ${usuario}.</p>`;
+            return;
+        }
+
+        registros.forEach(b => {
+            const div = document.createElement('div');
+            div.classList.add('bitacora-entry');
+            div.innerHTML = `
+                <strong>Entrada:</strong> ${b.entrada || '---'}<br>
+                <strong>Salida:</strong> ${b.salida || '---'}<br>
+                <strong>Monto Vendido:</strong> ₡${b.monto || '0'}<br>
+                <strong>Clientes:</strong> ${b.clientes || '0'}
+            `;
+            detalleDiv.appendChild(div);
+        });
+    }
+
+    function mostrarPerfil(user) {
+        const container = document.getElementById('perfilUsuario');
+        if (!container) return;
+
+        container.innerHTML = `                
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${user.foto || 'default.jpg'}" alt="Foto de perfil" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #d63384;">
+                <strong>${user.name}</strong>
+            </div>
+        `;
+    }
+
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        localStorage.removeItem('sesionActiva');
+        location.href = 'index.html';
+    });
+</script>
 </body>
 </html>
 
