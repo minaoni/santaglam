@@ -247,14 +247,22 @@ function mostrarPerfil(user) {
     `;
 
     // Permitir cambiar foto
-    const profileImg = document.getElementById('profilePic');
-    profileImg.addEventListener('click', () => {
-        const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
-        if (nuevaFoto) {
-            user.foto = nuevaFoto;
-            localStorage.setItem('users', JSON.stringify(users));
-            guardarSesion(user);
-            mostrarPerfil(user); // Recargar foto
+   profileImg.addEventListener('click', () => {
+    const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
+    if (nuevaFoto) {
+        user.foto = nuevaFoto;
+        
+        // Buscar el índice de la usuaria y actualizar en el array
+        const index = users.findIndex(u => u.user === user.user);
+        if (index !== -1) {
+            users[index].foto = nuevaFoto;
+        }
+
+        localStorage.setItem('users', JSON.stringify(users));
+        guardarSesion(user);
+        mostrarPerfil(user); // Recargar vista de perfil con nueva foto
+    }
+});
         }
     });
 }
@@ -294,16 +302,7 @@ document.getElementById('loginBtn').addEventListener('click', () => {
     if (user) {
         guardarSesion(user);
         mostrarPerfil(user);
-
-        setTimeout(() => {
-            if (user.role === 'Administrativa') {
-                window.location.href = 'bitacora.html';
-            } else if (user.role === 'Organizadora de Bodas') {
-                window.location.href = 'bodas.html';
-            } else if (user.role === 'Mesera') {
-                window.location.href = 'menu.html';
-            }
-        }, 1000);
+            
     } else {
         alert('Usuario o contraseña incorrectos.');
     }
