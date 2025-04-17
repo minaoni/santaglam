@@ -246,22 +246,7 @@ document.getElementById('logoutBtnNav').addEventListener('click', () => {
     location.reload();
 });
 
-        // Esperar a que la imagen esté en el DOM
-        const profileImg = document.getElementById('profilePic');
-        profileImg.addEventListener('click', () => {
-            const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
-            if (nuevaFoto) {
-                user.foto = nuevaFoto;
-                const index = users.findIndex(u => u.user === user.user);
-                if (index !== -1) {
-                    users[index].foto = nuevaFoto;
-                }
-                localStorage.setItem('users', JSON.stringify(users));
-                guardarSesion(user);
-                mostrarPerfil(user); // Refrescar perfil
-            }
-        });
-
+    
         // Cerrar sesión
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.addEventListener('click', () => {
