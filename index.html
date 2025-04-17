@@ -216,7 +216,8 @@
 
     // Mostrar perfil en pantalla
     function mostrarPerfil(user) {
-        toggleFormBtn.style.display = 'none';
+        toggleFormBtn.style.display = 'none'; // Ocultar el botón para mostrar el formulario
+        formWrapper.style.display = 'none'; // Ocultar todo el formulario de inicio de sesión y registro
         welcomeMessage.style.display = 'block';
         logoutBtnNav.style.display = 'inline-block';
 
@@ -230,7 +231,7 @@
     // Cerrar sesión
     logoutBtnNav.addEventListener('click', () => {
         localStorage.removeItem('sesionActiva');
-        location.reload();
+        location.reload(); // Recargar la página para mostrar nuevamente el formulario de login
     });
 
     // Registro
@@ -292,4 +293,3 @@
 </script>
 </body>
 </html>
-  
