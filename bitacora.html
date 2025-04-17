@@ -62,7 +62,7 @@
     <header>
         <h1>Bitácora de Empleadas</h1>
     </header>
-
+<div id="perfilUsuario" style="margin-left:auto; margin-right:1rem;"></div>
     <main>
         <div class="section">
             <button onclick="marcarEntrada()">Marcar Hora de Entrada</button>
@@ -177,7 +177,30 @@
             detalleDiv.appendChild(div);
         });
     }
+ function mostrarPerfil(user) {
+        const container = document.getElementById('perfilUsuario');
+        if (!container) return;
 
+        container.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${user.foto || 'default.jpg'}" alt="Foto de perfil" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #d63384;">
+                <strong>${user.name}</strong>
+            </div>
+        `;
+    }
+
+    const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
+    if (sesion) {
+        mostrarPerfil(sesion);
+    } else {
+        // Redirige si no hay sesión activa (opcional)
+        // window.location.href = 'index.html';
+    }
+
+    document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        localStorage.removeItem('sesionActiva');
+        location.href = 'index.html';
+    });
 
     </script>
 </body>
