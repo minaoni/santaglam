@@ -248,14 +248,6 @@ function mostrarPerfil(user) {
 
     // Permitir cambiar foto
 
-    const profileImg = document.getElementById('profilePic');
-    profileImg.addEventListener('click', () => {
-        const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
-        if (nuevaFoto) {
-            user.foto = nuevaFoto;
-            localStorage.setItem('users', JSON.stringify(users));
-            guardarSesion(user);
-            mostrarPerfil(user); // Recargar foto
 
     profileImg.addEventListener('click', () => {
     const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
