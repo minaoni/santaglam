@@ -182,40 +182,43 @@
 
     <script>
      
-    const toggleFormBtn = document.getElementById('toggleFormBtn');
-    const formWrapper = document.getElementById('formWrapper');
-    const formTitle = document.getElementById('formTitle');
-    const registerForm = document.getElementById('registerForm');
-    const loginForm = document.getElementById('loginForm');
-    const welcomeMessage = document.getElementById('welcomeMessage');
+const toggleFormBtn = document.getElementById('toggleFormBtn');
+const formWrapper = document.getElementById('formWrapper');
+const formTitle = document.getElementById('formTitle');
+const registerForm = document.getElementById('registerForm');
+const loginForm = document.getElementById('loginForm');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const logoutBtnNav = document.getElementById('logoutBtnNav');
 
-    let users = JSON.parse(localStorage.getItem('users')) || [];
+let users = JSON.parse(localStorage.getItem('users')) || [];
 
-    toggleFormBtn.addEventListener('click', () => {
-        formWrapper.style.display = formWrapper.style.display === 'none' ? 'block' : 'none';
-    });
+// Mostrar u ocultar el formulario
+toggleFormBtn.addEventListener('click', () => {
+    formWrapper.style.display = formWrapper.style.display === 'none' ? 'block' : 'none';
+});
 
-    document.getElementById('loginLink').addEventListener('click', () => {
-        formTitle.textContent = 'Iniciar Sesión';
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'block';
-    });
+// Alternar entre formularios
+document.getElementById('loginLink').addEventListener('click', () => {
+    formTitle.textContent = 'Iniciar Sesión';
+    registerForm.style.display = 'none';
+    loginForm.style.display = 'block';
+});
 
-    document.getElementById('registerLink').addEventListener('click', () => {
-        formTitle.textContent = 'Registrarse';
-        registerForm.style.display = 'block';
-        loginForm.style.display = 'none';
-    });
+document.getElementById('registerLink').addEventListener('click', () => {
+    formTitle.textContent = 'Registrarse';
+    registerForm.style.display = 'block';
+    loginForm.style.display = 'none';
+});
 
-    function guardarSesion(user) {
-        localStorage.setItem('sesionActiva', JSON.stringify(user));
-    }
+function guardarSesion(user) {
+    localStorage.setItem('sesionActiva', JSON.stringify(user));
+}
 
-    // Mostrar perfil en el header
-    function mostrarPerfil(user) {
+// Mostrar perfil en pantalla
+function mostrarPerfil(user) {
     toggleFormBtn.style.display = 'none';
     welcomeMessage.style.display = 'block';
-    document.getElementById('logoutBtnNav').style.display = 'inline-block'; // mostrar en nav
+    logoutBtnNav.style.display = 'inline-block';
 
     welcomeMessage.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center;">
@@ -224,7 +227,6 @@
         </div>
     `;
 
-    // Cambiar foto
     document.getElementById('profilePic').addEventListener('click', () => {
         const nuevaFoto = prompt("Pega aquí la URL de tu nueva foto:");
         if (nuevaFoto) {
@@ -235,65 +237,70 @@
             }
             localStorage.setItem('users', JSON.stringify(users));
             guardarSesion(user);
-            mostrarPerfil(user); // refrescar
+            mostrarPerfil(user); // Refrescar
         }
     });
 }
 
-// Agregar evento al botón del nav
-document.getElementById('logoutBtnNav').addEventListener('click', () => {
+// Cerrar sesión
+logoutBtnNav.addEventListener('click', () => {
     localStorage.removeItem('sesionActiva');
     location.reload();
 });
 
-    
-        // Cerrar sesión
-        const logoutBtn = document.getElementById('logoutBtn');
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('sesionActiva');
-            location.reload();
-        });
+// Registro
+document.getElementById('registerBtn').addEventListener('click', () => {
+    const user = document.getElementById('user').value;
+    const name = document.getElementById('name').value;
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
+
+    if (users.some(u => u.user === user)) {
+        alert("Este usuario ya está registrado.");
+        return;
     }
 
-    // Si ya hay una sesión activa, mostrar perfil
-    const sesionGuardada = JSON.parse(localStorage.getItem('sesionActiva'));
-    if (sesionGuardada) {
-        mostrarPerfil(sesionGuardada);
+    const newUser = { user, name, password, role, foto: 'default.jpg', approved: false };
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    guardarSesion(newUser);
+    mostrarPerfil(newUser);
+
+    // Guardar también en historial de bitácoras
+    let bitacoras = JSON.parse(localStorage.getItem('bitacoras')) || [];
+    if (!bitacoras.find(u => u.user === newUser.user)) {
+        bitacoras.push(newUser);
+        localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
     }
+});
 
-    // Registro con foto por defecto
-    document.getElementById('registerBtn').addEventListener('click', () => {
-        const user = document.getElementById('user').value;
-        const name = document.getElementById('name').value;
-        const password = document.getElementById('password').value;
-        const role = document.getElementById('role').value;
+// Iniciar sesión
+document.getElementById('loginBtn').addEventListener('click', () => {
+    const loginUser = document.getElementById('loginUser').value;
+    const loginPassword = document.getElementById('loginPassword').value;
 
-        if (users.some(u => u.user === user)) {
-            alert("Este usuario ya está registrado.");
-            return;
+    const user = users.find(user => user.user === loginUser && user.password === loginPassword);
+
+    if (user) {
+        guardarSesion(user);
+        mostrarPerfil(user);
+
+        // Asegurar que esté también en historial de bitácoras
+        let bitacoras = JSON.parse(localStorage.getItem('bitacoras')) || [];
+        if (!bitacoras.find(u => u.user === user.user)) {
+            bitacoras.push(user);
+            localStorage.setItem('bitacoras', JSON.stringify(bitacoras));
         }
+    } else {
+        alert('Usuario o contraseña incorrectos.');
+    }
+});
 
-        const newUser = { user, name, password, role, foto: 'default.jpg', approved: false };
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-        guardarSesion(newUser);
-        mostrarPerfil(newUser);
-    });
-
-    // Inicio de sesión
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        const loginUser = document.getElementById('loginUser').value;
-        const loginPassword = document.getElementById('loginPassword').value;
-
-        const user = users.find(user => user.user === loginUser && user.password === loginPassword);
-
-        if (user) {
-            guardarSesion(user);
-            mostrarPerfil(user);
-        } else {
-            alert('Usuario o contraseña incorrectos.');
-        }
-    });
+// Si ya hay una sesión activa, mostrar perfil
+const sesionGuardada = JSON.parse(localStorage.getItem('sesionActiva'));
+if (sesionGuardada) {
+    mostrarPerfil(sesionGuardada);
+}
     </script>
 
 </body>
