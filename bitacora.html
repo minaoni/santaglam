@@ -59,14 +59,9 @@
         #perfilUsuario {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            margin-right: 1rem;
-            margin-bottom: 20px;
-        }
-        #perfilUsuario div {
-            display: flex;
-            align-items: center;
             gap: 10px;
+            margin-left: auto;
+            margin-right: 1rem;
         }
         #perfilUsuario img {
             width: 50px;
@@ -76,20 +71,12 @@
             border: 2px solid #d63384;
         }
         #perfilUsuario strong {
-            color: #d63384;
+            font-size: 16px;
+            font-weight: bold;
         }
-        #logoContainer {
-            display: flex;
-            align-items: center;
-            background-color: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        #logoContainer img {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
+        #logoGlam {
+            width: 50px;
+            height: 50px;
         }
     </style>
 </head>
@@ -97,7 +84,13 @@
     <header>
         <h1>Bitácora de Empleadas</h1>
     </header>
+    
+    <!-- Contenedor de perfil y logo -->
     <div id="perfilUsuario"></div>
+    <div>
+        <img src="Logo.png" alt="Logo de SantaGLAM" id="logoGlam">
+    </div>
+
     <main>
         <div class="section">
             <button onclick="marcarEntrada()">Marcar Hora de Entrada</button>
@@ -122,12 +115,6 @@
                 <div id="bitacoraDetalle"></div>
             </div>
         </div>
-
-        <!-- Mostrar el logo y el nombre del usuario con sesión iniciada -->
-        <div id="logoContainer">
-            <img src="Logo.png" alt="Logo de SantaGLAM">
-            <div id="nombreUsuario"></div>
-        </div>
     </main>
 
     <script>
@@ -137,7 +124,6 @@
         const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
         if (sesion) {
             localStorage.setItem('usuarioActivo', sesion.name);
-            mostrarPerfil(sesion);
         }
 
         function getHoraActual() {
@@ -224,20 +210,41 @@
             const container = document.getElementById('perfilUsuario');
             if (!container) return;
 
-            container.innerHTML = `
+            container.innerHTML = `                
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <img src="${user.foto || 'default.jpg'}" alt="Foto de perfil" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #d63384;">
                     <strong>${user.name}</strong>
                 </div>
             `;
-            const nombreUsuarioDiv = document.getElementById('nombreUsuario');
-            nombreUsuarioDiv.innerHTML = `<strong>${user.name}</strong>`;
+        }
+
+        const sesion = JSON.parse(localStorage.getItem('sesionActiva'));
+        if (sesion) {
+            mostrarPerfil(sesion);
         }
 
         document.getElementById('logoutBtn')?.addEventListener('click', () => {
             localStorage.removeItem('sesionActiva');
             location.href = 'index.html';
         });
+
     </script>
 </body>
 </html>
+
+<footer>
+    <button onclick="window.location.href='index.html'" style="
+        background-color: #d63384;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    ">
+        ← Regresar al Inicio
+    </button>
+    <p style="margin-top: 10px;">SantaGLAM © 2025 | Solo para uso interno</p>
+</footer>
